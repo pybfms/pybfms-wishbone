@@ -9,14 +9,15 @@ module wb_initiator_bfm #(
 		) (
 		input							clock,
 		input							reset,
-		output reg						stb_o,
-		output reg						cyc_o,
-		output reg						we_o,
-		output reg[(DATA_WIDTH/8)-1:0]	sel_o,
-		output reg[DATA_WIDTH-1:0]		dat_o,
-		output reg[ADDR_WIDTH-1:0]		adr_o,
-		input							ack_i,
-		input[DATA_WIDTH-1:0]			dat_i
+		output reg[ADDR_WIDTH-1:0]		adr,
+		output reg[DATA_WIDTH-1:0]		dat_w,
+		input[DATA_WIDTH-1:0]			dat_r,
+		output reg						cyc,
+		input							err,
+		output reg[(DATA_WIDTH/8)-1:0]	sel,
+		output reg						stb,
+		input							ack,
+		output reg						we
 		);
 	reg						stb_v = 0;
 	reg						cyc_v = 0;
@@ -27,15 +28,21 @@ module wb_initiator_bfm #(
 	
 	reg						in_reset = 0;
 	reg[3:0]				post_reset_delay = 0;
+	reg[31:0]				wait_cnt = 0;
+	reg[31:0]				wait_cnt_v = 0;
 	
 	always @(posedge clock) begin
 		if (reset) begin
-			stb_o <= 0;
-			cyc_o <= 0;
-			we_o <= 0;
-			sel_o <= 0;
-			dat_o <= 0;
-			adr_o <= 0;
+			stb <= 0;
+			cyc <= 0;
+			we <= 0;
+			sel <= 0;
+			dat_w <= 0;
+			dat_v = 0;
+			adr <= 0;
+			adr_v = 0;
+			wait_cnt <= 0;
+			wait_cnt_v = 0;
 			in_reset <= 1;
 			post_reset_delay <= 0;
 		end else begin
@@ -47,24 +54,34 @@ module wb_initiator_bfm #(
 					post_reset_delay <= post_reset_delay + 1;
 				end
 			end
-			stb_o <= stb_v;
-			cyc_o <= cyc_v;
-			we_o <= we_v;
-			sel_o <= sel_v;
-			dat_o <= dat_v;
-			adr_o <= adr_v;
+			stb <= stb_v;
+			cyc <= cyc_v;
+			we <= we_v;
+			sel <= sel_v;
+			dat_w <= dat_v;
+			adr <= adr_v;
 			
-			if (cyc_o && stb_o && ack_i) begin
-				_access_ack(dat_i);
+			if (cyc && stb && ack) begin
+				_access_ack(dat_r);
 				stb_v = 0;
 				cyc_v = 0;
 				we_v = 0;
 				sel_v = 0;
 				dat_v = 0;
 				adr_v = 0;
-				stb_o <= 0;
-				cyc_o <= 0;
-				we_o <= 0;
+				stb <= 0;
+				cyc <= 0;
+				we <= 0;
+			end
+			
+			if (wait_cnt_v > 0) begin
+				if (wait_cnt >= wait_cnt_v) begin
+					_wait_ack();
+					wait_cnt_v = 0;
+					wait_cnt <= 0;
+				end else begin
+					wait_cnt <= wait_cnt+1;
+				end
 			end
 		end
 	end
@@ -75,14 +92,19 @@ module wb_initiator_bfm #(
 		input reg[7:0]			we,
 		input reg[7:0]			sel);
 	begin
-		$display("--> _access_req");
 		stb_v = 1;
 		cyc_v = 1;
 		we_v = we;
 		sel_v = sel;
 		dat_v = dat;
 		adr_v = adr;
-		$display("<-- _access_req");
+	end
+	endtask
+	
+	task _wait_req(
+		input reg[31:0]			cnt);
+	begin
+		wait_cnt_v = cnt;
 	end
 	endtask
 

@@ -50,6 +50,16 @@ class WbInitiatorBfm():
         self.busy.release()
         
         return self.dat_i
+    
+    async def wait(self, cycles):
+        await self.busy.acquire()
+        self._wait_req(cycles)
+        if not self.is_reset:
+            await self.reset_ev.wait()
+            self.reset_ev.clear()
+        await self.ack_ev.wait()
+        self.busy.release()
+        
         
     @pybfms.import_task(pybfms.uint64_t,pybfms.uint64_t,pybfms.uint8_t,pybfms.uint8_t)
     def _access_req(self, adr, dat, we, sel):
@@ -57,10 +67,16 @@ class WbInitiatorBfm():
     
     @pybfms.export_task(pybfms.uint64_t)
     def _access_ack(self, dat_i):
-        print("--> WbInitiatorBfm::_access_ack")
         self.dat_i = dat_i
         self.ack_ev.set()
-        print("<-- WbInitiatorBfm::_access_ack")
+        
+    @pybfms.import_task(pybfms.uint32_t)
+    def _wait_req(self, cycles):
+        pass
+    
+    @pybfms.export_task()
+    def _wait_ack(self):
+        self.ack_ev.set()
         
     @pybfms.export_task(pybfms.uint32_t,pybfms.uint32_t)
     def _set_parameters(self, addr_width, data_width):
@@ -69,7 +85,5 @@ class WbInitiatorBfm():
         
     @pybfms.export_task()
     def _reset(self):
-        print("--> _reset")
         self.is_reset = True
         self.reset_ev.set()
-        print("<-- _reset")
