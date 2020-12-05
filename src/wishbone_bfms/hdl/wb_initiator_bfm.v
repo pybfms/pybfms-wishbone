@@ -19,8 +19,8 @@ module wb_initiator_bfm #(
 		input							ack,
 		output reg						we
 		);
-	reg						stb_v = 0;
-	reg						cyc_v = 0;
+	reg[3:0]				stb_v = 0;
+	reg[3:0]				cyc_v = 0;
 	reg						we_v = 0;
 	reg[(DATA_WIDTH/8)-1:0]	sel_v = 0;
 	reg[DATA_WIDTH-1:0]		dat_v = 0;
@@ -54,8 +54,8 @@ module wb_initiator_bfm #(
 					post_reset_delay <= post_reset_delay + 1;
 				end
 			end
-			stb <= stb_v;
-			cyc <= cyc_v;
+			stb <= |stb_v;
+			cyc <= |cyc_v;
 			we <= we_v;
 			sel <= sel_v;
 			dat_w <= dat_v;
@@ -63,12 +63,14 @@ module wb_initiator_bfm #(
 			
 			if (cyc && stb && ack) begin
 				_access_ack(dat_r);
-				stb_v = 0;
-				cyc_v = 0;
+				stb_v = stb_v - 1;
+				cyc_v = cyc_v - 1;
+				/*
 				we_v = 0;
 				sel_v = 0;
 				dat_v = 0;
 				adr_v = 0;
+				*/
 				stb <= 0;
 				cyc <= 0;
 				we <= 0;
@@ -92,8 +94,8 @@ module wb_initiator_bfm #(
 		input reg[7:0]			we,
 		input reg[7:0]			sel);
 	begin
-		stb_v = 1;
-		cyc_v = 1;
+		stb_v = stb_v + 1;
+		cyc_v = cyc_v + 1;
 		we_v = we;
 		sel_v = sel;
 		dat_v = dat;
@@ -116,6 +118,8 @@ module wb_initiator_bfm #(
 	endtask
 
 	// Auto-generated code to implement the BFM API
+`ifdef PYBFMS_GEN
 ${pybfms_api_impl}
+`endif
 endmodule
  

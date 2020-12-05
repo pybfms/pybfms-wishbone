@@ -76,6 +76,8 @@ module wb_target_bfm #(
 	endtask
 
 	// Auto-generated code to implement the BFM API
+`ifdef PYBFMS_GEN
 ${pybfms_api_impl}
+`endif
 endmodule
  

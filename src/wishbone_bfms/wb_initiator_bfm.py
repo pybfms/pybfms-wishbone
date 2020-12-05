@@ -25,8 +25,10 @@ class WbInitiatorBfm():
         await self.busy.acquire()
 
         if not self.is_reset:
+            print("--> wait_reset")
             await self.reset_ev.wait()
             self.reset_ev.clear()
+            print("<-- wait_reset")
 
         self._access_req(adr, dat, 1, sel)
         
@@ -85,5 +87,7 @@ class WbInitiatorBfm():
         
     @pybfms.export_task()
     def _reset(self):
+        print("--> _reset")
         self.is_reset = True
         self.reset_ev.set()
+        print("<-- _reset")
