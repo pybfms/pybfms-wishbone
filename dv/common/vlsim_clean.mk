@@ -6,5 +6,5 @@
 #****************************************************************************
 
 clean ::
-	rm -f simv.* simx.fst simx.vcd pybfms_gen.sv pybfms_gen.c
+	rm -rf simv.* simx.fst simx.vcd pybfms_gen.sv pybfms_gen.c
 	rm -rf obj_dir

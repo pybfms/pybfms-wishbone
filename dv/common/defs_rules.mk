@@ -24,7 +24,6 @@ export PATH
 #* Source setup
 #********************************************************************
 FWRISC_SRCS = $(wildcard $(PACKAGES_DIR)/fwrisc/rtl/*.sv)
-INCDIRS += $(PACKAGES_DIR)/fwrisc/rtl
 INCDIRS += $(PACKAGES_DIR)/fwprotocol-defs/src/sv
 
 include $(COMMON_DIR)/$(SIM).mk

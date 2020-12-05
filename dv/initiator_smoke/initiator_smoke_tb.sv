@@ -29,7 +29,7 @@ module initiator_smoke_tb(input clk);
 	
 	wire clock = clk;
 	reg reset = 1;
-	reg[4] reset_cnt = 0;
+	reg[3:0] reset_cnt = 0;
 
 	always @(posedge clock) begin
 		if (reset_cnt == 'hf) begin
