@@ -22,13 +22,16 @@ class WbInitiatorBfm():
         self.is_reset = False
         
     async def write(self, adr, dat, sel):
+        """
+        Write data according to the mask 'sel'.
+        
+        Note that this call will block until the first reset is received
+        """
         await self.busy.acquire()
 
         if not self.is_reset:
-            print("--> wait_reset")
             await self.reset_ev.wait()
             self.reset_ev.clear()
-            print("<-- wait_reset")
 
         self._access_req(adr, dat, 1, sel)
         
@@ -38,6 +41,11 @@ class WbInitiatorBfm():
         self.busy.release()
         
     async def read(self, adr):
+        """
+        Read data from the system.
+        
+        Note that this call will block until the first reset is received
+        """
         await self.busy.acquire()
         
         if not self.is_reset:
@@ -54,11 +62,14 @@ class WbInitiatorBfm():
         return self.dat_i
     
     async def wait(self, cycles):
+        """
+        Wait for the specified number of interface-clock cycles.
+        
+        Note that this call does not wait for a reset
+        """
+        
         await self.busy.acquire()
         self._wait_req(cycles)
-        if not self.is_reset:
-            await self.reset_ev.wait()
-            self.reset_ev.clear()
         await self.ack_ev.wait()
         self.busy.release()
         
@@ -87,7 +98,5 @@ class WbInitiatorBfm():
         
     @pybfms.export_task()
     def _reset(self):
-        print("--> _reset")
         self.is_reset = True
         self.reset_ev.set()
-        print("<-- _reset")
