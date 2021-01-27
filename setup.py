@@ -47,6 +47,7 @@ setup(
   cmdclass=cmdclass,
   install_requires=[
     'cocotb',
+    'pybfms',
   ],
 )
 
