@@ -30,7 +30,7 @@ if bdist_wheel:
     cmdclass['bdist_wheel'] = bdist_wheel
 
 setup(
-  name = "pybfms_wishbone",
+  name = "pybfms-wishbone",
   version=VERSION,
   packages=['wishbone_bfms'],
   package_dir = {'' : 'src'},
