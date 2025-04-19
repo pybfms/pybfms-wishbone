@@ -1,29 +1,41 @@
 package:
     name: wishbone_bfms
-    version: None
-    deps:
-        - name: simscripts
-          url: http://github.com/mballance/simscripts.git
-          type: raw
-        - name: fwprotocol-defs
-          url: http://github.com/Featherweight-IP/fwprotocol-defs.git
-          type: raw
-        - name: vlsim
-          url: http://github.com/mballance/vlsim.git
-          type: python
-        - name: cocotb
-          type: python
-          src: pypi
-        - name: pybfms
-          url: https://github.com/pybfms/pybfms.git
-          type: python
-        - name: fltools
-          url: https://github.com/fvutils/fltools.git
-          type: python
-    dev-deps:
-        - name: simscripts
-          url: http://github.com/mballance/simscripts.git
-          type: raw
-        - name: fwprotocol-defs
-          url: http://github.com/Featherweight-IP/fwprotocol-defs.git
-          type: raw
+
+    dep-sets:
+    - name: default
+      deps:
+      - name: simscripts
+        url: http://github.com/mballance/simscripts.git
+        type: raw
+      - name: fwprotocol-defs
+        url: http://github.com/Featherweight-IP/fwprotocol-defs.git
+        type: raw
+      - name: vlsim
+        url: http://github.com/mballance/vlsim.git
+        type: python
+      - name: cocotb
+        type: python
+        src: pypi
+      - name: pybfms
+        url: https://github.com/pybfms/pybfms.git
+        type: python
+      - name: fltools
+        url: https://github.com/fvutils/fltools.git
+        type: python
+
+    - name: default-dev
+      deps:
+      - name: simscripts
+        url: http://github.com/mballance/simscripts.git
+        type: raw
+      - name: fwprotocol-defs
+        url: http://github.com/Featherweight-IP/fwprotocol-defs.git
+        type: raw
+
+    paths:
+      export:
+        lib-dirs:
+          - verilog/rtl
+      project:
+        lib-dirs:
+          - verilog/rtl
